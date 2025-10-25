@@ -6,7 +6,7 @@ import { TaskManagement } from "@/components/task-management"
 import { PreferencesPanel } from "@/components/preferences-panel"
 import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer"
 import { useLocalStorage } from "@/hooks/use-local-storage"
-import { addTask, toggleTask, deleteTask, updatePreferences, updateTimerStats } from "@/lib/storage"
+import { addTask, toggleTask, deleteTask, updatePreferences, updateTimerStats, getStorageData } from "@/lib/storage"
 import { getRandomMotivationalMessage } from "@/lib/motivational-messages"
 
 type ViewMode = "focus-only" | "tasks" | "all-focus"
@@ -41,6 +41,13 @@ export default function Page() {
       setPrevFocusCount(focusCount)
       if (data) {
         updateTimerStats(1, 0)
+        // refresh local state from storage so the UI re-renders with updated stats
+        try {
+          const fresh = getStorageData()
+          updateData(fresh)
+        } catch (e) {
+          console.error("Failed to refresh storage data after stats update:", e)
+        }
       }
     }
   }, [focusCount, prevFocusCount, data])
